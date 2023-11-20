@@ -15,3 +15,11 @@ $: console.log(form)
 	</label>
 	<button>Create Story</button>
 </form>
+{#if form?.error}
+	<p>{form.error}</p>
+{/if}
+{#if form?.success == true}
+	{#each form.output.hops as hop}
+		<p>{hop.geolocation.city}</p>
+	{/each}
+{/if}
