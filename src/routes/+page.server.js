@@ -13,7 +13,6 @@ async function fetchGeolocation(query) {
       },
     });
     const jsonData = await response.json();
-    console.log(jsonData)
     return jsonData;
   } catch (error) {
     console.error('Error fetching geolocation data:', error);
@@ -23,7 +22,6 @@ async function fetchGeolocation(query) {
 
 function generateQuery(trace_output) {
     const ips = []
-    ips.push(trace_output.destination)
     trace_output.hops.forEach((hop) => {
       ips.push(hop.ip)
     })
@@ -60,13 +58,57 @@ async function trace(url) {
     });
 }
 
-function process_data(trace_output,located_output) {
-    trace_output["destination"]["geolocation"] = located_output[0]
-    trace_output["hops"].forEach((hop) => {
-        hop["geolocation"] = located_output[hop["number"]]
-    })
-    return trace_output
+function gen_geojson(obj, number){
+    if (obj["status"]!="success"){
+        return null;
+    }
+    return {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [obj["lon"], obj["lat"]]
+        },
+        "properties": {
+          "number": number,  
+          "city": obj["city"],
+          "country": obj["country"]
+        }
+    };
 }
+
+function process_data(trace_output, located_output) {
+    const points = [];
+    let i = 1
+    trace_output["hops"].forEach((hop) => {
+        const point = gen_geojson(located_output[hop["number"]-1], i)
+        if (point != null){
+            points.push(point);
+            i = i + 1
+        }
+    });
+    return {
+        "type": "FeatureCollection",
+        "features": points
+    };
+}
+
+function calculateCenter(geojson) {
+    const points = geojson.features.map((feature) => feature.geometry.coordinates);
+    const totalPoints = points.length;
+    let sumLat = 0;
+    let sumLng = 0;
+  
+    points.forEach((point) => {
+      sumLat += point[1];
+      sumLng += point[0];
+    });
+  
+    const centerLat = sumLat / totalPoints;
+    const centerLng = sumLng / totalPoints;
+  
+    return [centerLng, centerLat];
+  }
+  
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -74,10 +116,9 @@ export const actions = {
         const data = await request.formData();
         const url = data.get('url');
         let trace_output = await trace(url);
-        console.log(trace_output)
         let located_output = await fetchGeolocation(generateQuery(trace_output));
-        let processed_output = process_data(trace_output,located_output)
-        console.log(processed_output);
-		return {success: true, output: processed_output};
+        let points = process_data(trace_output,located_output)
+        const center = calculateCenter(points);
+		return {success: true, points: points, center: center};
 	}
 };

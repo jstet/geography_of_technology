@@ -1,5 +1,6 @@
-<svelte:head>
-
-</svelte:head>
+<script>
+    import "../app.css";
+  </script>
+  
 
 <slot />
