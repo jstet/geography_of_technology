@@ -40,7 +40,7 @@ function generateQuery(trace_output) {
   }
 
 async function trace(url_) {
-    let url = url_;
+    let url = url_.trim();
     const ipAddress = ip.address()
     return new Promise((resolve, reject) => {
       if (url===""){
