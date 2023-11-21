@@ -38,7 +38,7 @@ async function trace(url_) {
       if (url===""){
         reject("No URL provided");
       }
-        let output = {hops: [{ip: ipAddress, number: 0, time: 0}]};
+        let output = {hops: [{ip: ipAddress, number: 0, time: 0, }], destination_url: url};
         try {
             const tracer = new Traceroute();
             tracer
@@ -189,6 +189,6 @@ export const actions = {
         const center = calculateCenter(points);
 
         console.log(trace_output["hops"])
-		return {success: true, points: points, line: line, center: center, hops: trace_output["hops"].length};
+		return {success: true, points: points, line: line, center: center, hops: trace_output["hops"].length, destination_url: trace_output["destination_url"]};
 	}
 };

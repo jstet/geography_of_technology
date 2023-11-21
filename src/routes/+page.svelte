@@ -64,13 +64,13 @@
 				
 			<p class="pb-3">The production and maintenance of servers involve the use of tangible resources like metals and water, and the creation of their technical hardware requires human labor. Once operational, servers demand a continuous power supply. The servers managing requests are often controlled by various organizations unrelated to the final destination.</p>
 
-			<h3 class="text-md font-bold pb-2">Disclaimer</h3>
+			<h3 class="font-bold pb-3">Disclaimer</h3>
 			<p class="pb-3">This application incorporates server-side code, executed on a server before being transmitted to your browser. Unless you run the app locally, the server executing this code is situated somewhere globally, and the route's origin is not your current location. Moreover, certain servers limit inspection or have been combined due to identical locations.</p>
-		    <h2 class="text-lg font-bold pb-2">Journey</h2>	
+		    <h2 class="text-lg font-bold pb-3">Journey</h2>	
 		</div>
 		{#if form?.success == true && center}
 		<div class="ml-8 pr-4">
-		<p class="pb-3">The request traversed a network of <strong class="text-lg">{form.hops}</strong> servers. The following list comprises traceable server locations along the path of the request.</p>
+		<p class="pb-3">The request to <strong>{form.destination_url}</strong> traversed a network of <strong class="text-lg">{form.hops}</strong> servers. The following list comprises traceable server locations along the path of the request.</p>
 	</div>
 		<div class="border-t">
 			{#each form?.points.features as point,i}
