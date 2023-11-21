@@ -120,7 +120,7 @@
 				  maxZoom: 14,
 				  properties: {
 					// Sum the `mag` property from all the points in each cluster.
-					number: ["concat", ['get', "number"]],
+					number: ["concat", ['get', "number"]]
 				},
 				}}>
 					<MarkerLayer let:feature >
@@ -129,9 +129,11 @@
 								{feature.properties.number.replace(/,\s*$/, "")}
 							</div>
 						</div>
+						{#if feature.properties.city}
 						<Popup openOn="hover">
 							{feature.properties.city}
 						</Popup>
+						{/if}
 					</MarkerLayer>
 				</GeoJSON>
 				<GeoJSON id="line" data={form.line}>
