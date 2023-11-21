@@ -99,11 +99,19 @@
 				zoom={3}
 				hash
 			>
-				<GeoJSON id="points" data={form.points} promoteId="number">
-					<MarkerLayer interactive let:feature>
+				<GeoJSON id="points" data={form.points} promoteId="promoteId" 
+				cluster={{
+				  radius: 300,
+				  maxZoom: 14,
+				  properties: {
+					// Sum the `mag` property from all the points in each cluster.
+					number: ["concat", ['get', "number"]],
+				},
+				}}>
+					<MarkerLayer let:feature >
 						<div class="bg-gray-200 rounded-full py-1 px-3 shadow">
 							<div class="text-sm font-bold">
-								{feature.properties.number}
+								{feature.properties.number.replace(/,\s*$/, "")}
 							</div>
 						</div>
 						<Popup openOn="hover">

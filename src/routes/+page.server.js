@@ -73,7 +73,7 @@ function gen_point(obj, number){
           "coordinates": [obj["lon"], obj["lat"]]
         },
         "properties": {
-          "number": number,  
+          "number": `${number}, `,  
           "city": obj["city"],
           "country": obj["country"],
           "organization": obj["org"],
@@ -92,7 +92,7 @@ function areArraysEqual(array1, array2) {
 
 
 function process_data(trace_output, located_output) {
-    const points = [];
+    let points = [];
     const linePoints = [];
     let i = 1
     let prevCoords = ""
@@ -113,6 +113,10 @@ function process_data(trace_output, located_output) {
             }
         }        
 
+    });
+    points = points.map((point, index) => {
+      point["properties"]["promoteId"] = points.length - index;
+      return point;
     });
     const pointsColl =  {
         "type": "FeatureCollection",
