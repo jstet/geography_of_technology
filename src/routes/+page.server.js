@@ -62,7 +62,6 @@ async function trace(url) {
 }
 
 function gen_point(obj, number){
-    console.log(obj)
     if (obj["status"]!="success"){
         return null;
     }

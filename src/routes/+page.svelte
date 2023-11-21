@@ -21,7 +21,6 @@
 		center = form.center;
 	}
 
-	$: console.log(form);
 </script>
 
 <div class="grid grid-cols-2 h-[10vh]">
