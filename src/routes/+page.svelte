@@ -53,25 +53,29 @@
 	</div>
 
 	<div />
-
-	{#if form?.error}
-		<p>{form.error}</p>
-	{/if}
 </div>
 <div class="w-full grid grid-cols-2 h-[90vh] overflow-hidden">
 	<div class="overflow-scroll">
+		<div class="ml-8 pr-4">
+			<h2 class="text-lg font-bold pb-4">Introduction</h2>
+			<p class="pb-3">The internet functions as a global network that links computers and devices, allowing them to communicate through standardized protocols. This extensive framework enables the global exchange and sharing of information, resources, and services. Users worldwide can connect, communicate, and access a broad spectrum of content, including websites, documents, images, videos, and more. In modern life, the internet has become integral, influencing how we communicate, work, learn, and entertain ourselves. Its transformative influence is apparent in its role in connecting people globally, establishing itself as a fundamental tool for disseminating information and fostering collaboration.</p>
+
+			<p class="pb-3">When sending a request over the internet, it doesn't follow a direct path to the destination address. Instead data is dynamically routed through multiple servers. Despite its often-perceived virtual nature, the internet has a tangible reality, with everything existing on and passing through physical servers.</p>
+				
+			<p class="pb-3">The production and maintenance of servers involve the use of tangible resources like metals and water, and the creation of their technical hardware requires human labor. Once operational, servers demand a continuous power supply. The servers managing requests are often controlled by various organizations unrelated to the final destination.</p>
+
+			<h3 class="text-md font-bold pb-2">Disclaimer</h3>
+			<p class="pb-3">This application incorporates server-side code, executed on a server before being transmitted to your browser. Unless you run the app locally, the server executing this code is situated somewhere globally, and the route's origin is not your current location. Moreover, certain servers limit inspection or have been combined due to identical locations.</p>
+		    <h2 class="text-lg font-bold pb-2">Journey</h2>	
+		</div>
 		{#if form?.success == true && center}
 		<div class="ml-8 pr-4">
-			<p class="pb-3">When sending a request over the internet, it doesn't follow a direct path to the destination server. The internet, a vast network of interconnected routers and servers, dynamically routes data through multiple servers. Despite its often-perceived virtual nature, the internet has a tangible reality, with everything existing on and passing through physical servers.</p>
-				
-			<p class="pb-3">The production and maintenance of these servers involve the use of tangible resources like metals and water, and the creation of their technical hardware requires human labor. Once operational, servers demand a continuous power supply, often generated using fossil resources. The servers managing requests are often controlled by various organizations unrelated to the final destination.</p>
-				
-			<p class="pb-3">Some servers do not allow inspection. Tracable servers that are on the requests path are listed below:</p>
-		</div>
+		<p class="pb-3">The request traversed a network of <strong class="text-lg">{form.hops}</strong> servers. The following list comprises traceable server locations along the path of the request.</p>
+	</div>
 		<div class="border-t">
 			{#each form?.points.features as point,i}
 				<Chapter
-					number={point.properties.number}
+					number={point.properties.number.replace(/,\s*$/, "")}
 					city={point.properties.city}
 					country={point.properties.country}
 					organization={point.properties.organization}
@@ -81,9 +85,20 @@
 				
 			{/each}
 		</div>
+		{:else if form?.error}
+		<div class="ml-8 pr-4">
+			<div role="alert" class="alert alert-error">
+				<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+				<span>Could not load journey: {form.error}</span>
+			  </div>
+			
+		</div>
 		{:else }
-		<div class="h-[90vh] flex justify-center items-center">
-			<p class="text-center">...enter a URL</p>
+		<div class="ml-8 pr-4">
+			<div role="alert" class="alert">
+				<Info height={20} width={20} />
+				<span>Enter a URL to get started</span>
+			  </div>
 		</div>
 			
 		{/if}
@@ -145,7 +160,8 @@
 <Modal bind:showModal>
 	<h2 class="text-xl pb-4 font-bold">What is this app about?</h2>
 	<p class="pb-2">This application was developed as part of the "Data and Society" course at UBC. The assignment required the creation of a nonlinear, geographic narrative that illustrates the various resource involved in the development or maintenance of a piece technology used in everyday life. </p>
-	<p class="pb-2">I chose to create a dynamic story that, given an internet address, visualizes the route a request takes to reach a server. To retrieve the ips of the servers a request goes through, I utilized the <a class="link" href="https://en.wikipedia.org/wiki/Traceroute">traceroute</a> program. The location and addtional information of servers is retrieved using the <a class="link" href="https://ip-api.com/">ip-api.com</a>.</p>
+
+	<p class="pb-2">I chose to create  dynamic story that, given an internet address, visualizes the route a request takes to reach a server. To retrieve the ips of the servers a request goes through, I utilized the <a class="link" href="https://en.wikipedia.org/wiki/Traceroute">traceroute</a> program. The location and addtional information of servers is retrieved using the <a class="link" href="https://ip-api.com/">ip-api.com</a>.</p>
 	<p class="pb-2">
 		Find the source code of the app <a  class="link" href="https://github.com/jstet/geography_of_technology-">here</a>.
 	</p>

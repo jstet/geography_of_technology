@@ -31,9 +31,13 @@ function generateQuery(trace_output) {
   
   }
 
-async function trace(url) {
+async function trace(url_) {
+    const url = url_.replace("https://", "");
     const ipAddress = ip.address()
     return new Promise((resolve, reject) => {
+      if (url===""){
+        reject("No URL provided");
+      }
         let output = {hops: [{ip: ipAddress, number: 0, time: 0}]};
         try {
             const tracer = new Traceroute();
@@ -65,6 +69,13 @@ function gen_point(obj, number){
     if (obj["status"]!="success"){
         return null;
     }
+    let org;
+    if (!obj["org"]){
+        org = "Unknown"
+    }
+    else{
+        org = obj["org"]
+    }
  
     return {
         "type": "Feature",
@@ -76,7 +87,7 @@ function gen_point(obj, number){
           "number": `${number}, `,  
           "city": obj["city"],
           "country": obj["country"],
-          "organization": obj["org"],
+          "organization": org,
           "isp": obj["isp"]
         }
     };
@@ -162,12 +173,22 @@ export const actions = {
 	default: async ({ request }) => {
         const data = await request.formData();
         const url = data.get('url');
-        let trace_output = await trace(url);
+        let trace_output;
+        try {
+          trace_output = await trace(url);
+          // Handle successful trace output here
+        } catch (error) {
+          // Handle error from the trace function
+          return { success: false, error: error };
+        }
+
         let located_output = await fetchGeolocation(generateQuery(trace_output));
         const processed = process_data(trace_output, located_output)
         let points = processed[0]
         let line = processed[1]
         const center = calculateCenter(points);
-		return {success: true, points: points, line: line, center: center};
+
+        console.log(trace_output["hops"])
+		return {success: true, points: points, line: line, center: center, hops: trace_output["hops"].length};
 	}
 };
