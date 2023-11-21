@@ -1,5 +1,7 @@
 import Traceroute from "nodejs-traceroute"
 import fetch from 'node-fetch';
+import ip from "ip";
+
 
 async function fetchGeolocation(query) {
   const url = 'http://ip-api.com/batch';
@@ -30,8 +32,9 @@ function generateQuery(trace_output) {
   }
 
 async function trace(url) {
+    const ipAddress = ip.address()
     return new Promise((resolve, reject) => {
-        let output = {hops: []};
+        let output = {hops: [{ip: ipAddress, number: 0, time: 0}]};
         try {
             const tracer = new Traceroute();
             tracer
@@ -58,10 +61,12 @@ async function trace(url) {
     });
 }
 
-function gen_geojson(obj, number){
+function gen_point(obj, number){
+    console.log(obj)
     if (obj["status"]!="success"){
         return null;
     }
+ 
     return {
         "type": "Feature",
         "geometry": {
@@ -71,25 +76,64 @@ function gen_geojson(obj, number){
         "properties": {
           "number": number,  
           "city": obj["city"],
-          "country": obj["country"]
+          "country": obj["country"],
+          "organization": obj["org"],
+          "isp": obj["isp"]
         }
     };
 }
 
+function areArraysEqual(array1, array2) {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  return array1.every((element) => array2.includes(element));
+}
+
+
 function process_data(trace_output, located_output) {
     const points = [];
+    const linePoints = [];
     let i = 1
+    let prevCoords = ""
     trace_output["hops"].forEach((hop) => {
-        const point = gen_geojson(located_output[hop["number"]-1], i)
+        let shouldBreak = false;
+        const point = gen_point(located_output[hop["number"]], i)
         if (point != null){
-            points.push(point);
-            i = i + 1
-        }
+            if (i !== 1){
+                if(areArraysEqual(prevCoords, point["geometry"]["coordinates"])){
+                    shouldBreak = true;
+                }
+            }
+            if (shouldBreak === false){
+                points.push(point);
+                linePoints.push([point.geometry.coordinates[0], point.geometry.coordinates[1]]);
+                i = i + 1
+                prevCoords = point["geometry"]["coordinates"]
+            }
+        }        
+
     });
-    return {
+    const pointsColl =  {
         "type": "FeatureCollection",
         "features": points
     };
+
+    const lineColl = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": linePoints
+                }
+            }
+        ]
+    };
+
+    return [pointsColl, lineColl]
 }
 
 function calculateCenter(geojson) {
@@ -117,8 +161,10 @@ export const actions = {
         const url = data.get('url');
         let trace_output = await trace(url);
         let located_output = await fetchGeolocation(generateQuery(trace_output));
-        let points = process_data(trace_output,located_output)
+        const processed = process_data(trace_output, located_output)
+        let points = processed[0]
+        let line = processed[1]
         const center = calculateCenter(points);
-		return {success: true, points: points, center: center};
+		return {success: true, points: points, line: line, center: center};
 	}
 };

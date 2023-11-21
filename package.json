@@ -17,6 +17,7 @@
 	"dependencies": {
 		"autoprefixer": "^10.4.16",
 		"daisyui": "^4.4.2",
+		"ip": "^1.1.8",
 		"node-fetch": "^3.3.2",
 		"nodejs-traceroute": "^2.0.1",
 		"postcss": "^8.4.31",
