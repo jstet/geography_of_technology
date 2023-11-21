@@ -2,9 +2,17 @@ import Traceroute from "nodejs-traceroute"
 import fetch from 'node-fetch';
 import ip from "ip";
 
+function getDomainFromUrl(url_) {
+  if (!url_.startsWith('http://') && !url_.startsWith('https://')) {
+    url_ = 'https://' + url_;
+  }
+  let url = new URL(url_);
+  console.log(url.hostname)
+  return url.hostname;
+}
 
 async function fetchGeolocation(query) {
-  const url = 'http://ip-api.com/batch';
+  let url = 'http://ip-api.com/batch';
   
   try {
     const response = await fetch(url, {
@@ -32,13 +40,20 @@ function generateQuery(trace_output) {
   }
 
 async function trace(url_) {
-    const url = url_.replace("https://", "");
+    let url = url_;
     const ipAddress = ip.address()
     return new Promise((resolve, reject) => {
       if (url===""){
         reject("No URL provided");
       }
-        let output = {hops: [{ip: ipAddress, number: 0, time: 0, }], destination_url: url};
+      try{
+        url = getDomainFromUrl(url_);
+      }
+      catch(err){
+        console.log(err)
+        reject(err);
+      }
+        let output = {hops: [{ip: ipAddress, number: 0, time: 0, }], destination_url: url_};
         try {
             const tracer = new Traceroute();
             tracer
@@ -187,8 +202,6 @@ export const actions = {
         let points = processed[0]
         let line = processed[1]
         const center = calculateCenter(points);
-
-        console.log(trace_output["hops"])
 		return {success: true, points: points, line: line, center: center, hops: trace_output["hops"].length, destination_url: trace_output["destination_url"]};
 	}
 };
