@@ -165,7 +165,7 @@
 
 	<p class="pb-2">I chose to create  dynamic story that, given an internet address, visualizes the route a request takes to reach a server. To retrieve the ips of the servers a request goes through, I utilized the <a class="link" href="https://en.wikipedia.org/wiki/Traceroute">traceroute</a> program. The location and addtional information of servers is retrieved using the <a class="link" href="https://ip-api.com/">ip-api.com</a>.</p>
 	<p class="pb-2">
-		Find the source code of the app <a  class="link" href="https://github.com/jstet/geography_of_technology-">here</a>.
+		Find the source code of the app <a  class="link" href="https://github.com/jstet/geography_of_technology">here</a>.
 	</p>
 
 </Modal>
